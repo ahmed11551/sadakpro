@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: sadaqa_user
+      POSTGRES_PASSWORD: sadaqa_pass
+      POSTGRES_DB: sadaqa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://sadaqa_user:sadaqa_pass@postgres:5432/sadaqa_db
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+
+  bot:
+    build: ./bot
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      WEBAPP_URL: ${WEBAPP_URL}
+      API_URL: http://backend:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./bot:/app
+
+volumes:
+  postgres_data:
+
