@@ -10,4 +10,5 @@ asyncpg==0.29.0
 httpx==0.25.2
 cryptography==41.0.8
 aiofiles==23.2.1
+email-validator==2.1.0
 
