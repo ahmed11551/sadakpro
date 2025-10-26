@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import WebApp from '@twa-dev/sdk'
 import Donate from './pages/Donate'
 import Support from './pages/Support'
 import Campaigns from './pages/Campaigns'
@@ -19,8 +18,11 @@ function App() {
     setActiveTab(tab)
     
     // Set theme color
-    document.documentElement.style.setProperty('--tg-theme-bg-color', WebApp.themeParams.bg_color || '#ffffff')
-    document.documentElement.style.setProperty('--tg-theme-text-color', WebApp.themeParams.text_color || '#000000')
+    if (window.Telegram?.WebApp?.themeParams) {
+      const theme = window.Telegram.WebApp.themeParams
+      document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#ffffff')
+      document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#000000')
+    }
   }, [])
 
   return (
