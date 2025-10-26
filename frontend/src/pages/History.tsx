@@ -1,3 +1,5 @@
+import { useStats } from '../hooks/useStats'
+import { useDonations } from '../hooks/useDonations'
 import '../App.css'
 
 interface Transaction {
@@ -12,18 +14,24 @@ interface Transaction {
 }
 
 function History() {
-  const transactions: Transaction[] = [
+  const { stats, loading: statsLoading } = useStats()
+  const { donations, loading: donationsLoading } = useDonations(10)
+  
+  // Transform API donations to transactions
+  const transactions: Transaction[] = donations.map(donation => ({
+    id: donation.id,
+    date: donation.date.split('T')[0],
+    time: donation.date.split('T')[1]?.split('.')[0] || '',
+    type: 'Пожертвование',
+    amount: donation.amount,
+    status: donation.status === 'completed' ? 'Успешно' : donation.status,
+    fund: donation.fund_name
+  }))
+  
+  // Add mock data if API returns less than 5 items
+  const mockTransactions: Transaction[] = [
     {
-      id: 1,
-      date: '2024-10-26',
-      time: '14:32',
-      type: 'Пожертвование',
-      amount: 5000,
-      status: 'Успешно',
-      fund: '🎁 Фонд помощи сиротам'
-    },
-    {
-      id: 2,
+      id: 100,
       date: '2024-10-24',
       time: '09:15',
       type: 'Подписка',
@@ -32,33 +40,17 @@ function History() {
       campaign: 'Pro - 3 месяца'
     },
     {
-      id: 3,
-      date: '2024-10-20',
-      time: '16:45',
-      type: 'Пожертвование',
-      amount: 1000,
-      status: 'Успешно',
-      fund: '🏛️ Построй мечеть'
-    },
-    {
-      id: 4,
+      id: 101,
       date: '2024-10-18',
       time: '11:30',
       type: 'Закят',
       amount: 12500,
       status: 'Успешно',
       campaign: 'Расчёт закята'
-    },
-    {
-      id: 5,
-      date: '2024-10-15',
-      time: '13:20',
-      type: 'Кампания',
-      amount: 2500,
-      status: 'Успешно',
-      campaign: '🎯 Помощь сиротам в обучении'
     }
   ]
+  
+  const allTransactions = [...transactions, ...mockTransactions].slice(0, 10)
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -92,11 +84,11 @@ function History() {
 
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-value">{formatNumber(18970)}</div>
+          <div className="stat-value">{statsLoading ? '...' : formatNumber(stats?.total_amount || 0)}</div>
           <div className="stat-label">Всего пожертвовано</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{transactions.length}</div>
+          <div className="stat-value">{statsLoading ? '...' : stats?.total_donations || 0}</div>
           <div className="stat-label">Транзакций</div>
         </div>
       </div>
@@ -113,7 +105,13 @@ function History() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        {transactions.map(transaction => (
+        {donationsLoading ? (
+          <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
+            <div className="loading">
+              <div className="spinner"></div>
+            </div>
+          </div>
+        ) : allTransactions.map(transaction => (
           <div key={transaction.id} className="card" style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
               <div style={{ flex: 1 }}>

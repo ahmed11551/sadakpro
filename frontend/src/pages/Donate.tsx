@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useStats } from '../hooks/useStats'
 import '../App.css'
 
 function Donate() {
@@ -6,14 +7,37 @@ function Donate() {
   const [customAmount, setCustomAmount] = useState<string>('')
   const [fundId, setFundId] = useState<string>('')
   const [category, setCategory] = useState<string>('')
+  const { stats, loading } = useStats()
 
   const amounts = [100, 250, 500, 1000, 2500, 5000]
 
-  const handleDonate = () => {
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}М`
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}К`
+    return num.toString()
+  }
+
+  const handleDonate = async () => {
     const amount = selectedAmount || parseFloat(customAmount)
     if (amount > 0) {
-      alert(`Спасибо! Вы пожертвовали ${amount} ₽`)
-      // TODO: Implement payment flow
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/replika/donations/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer test_token_123'
+          },
+          body: JSON.stringify({
+            amount,
+            fund_id: fundId,
+            category,
+            timestamp: new Date().toISOString()
+          })
+        })
+        alert(`Спасибо! Вы пожертвовали ${amount} ₽`)
+      } catch (error) {
+        alert(`Ошибка: ${error}`)
+      }
     }
   }
 
@@ -23,11 +47,11 @@ function Donate() {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-value">1,240</div>
-          <div className="stat-label">Пожертвований</div>
+          <div className="stat-value">{loading ? '...' : formatNumber(stats?.total_donations || 0)}</div>
+          <div className="stat-label">Всего пожертвований</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">524К ₽</div>
+          <div className="stat-value">{loading ? '...' : formatNumber(stats?.today_amount || 0)} ₽</div>
           <div className="stat-label">Собрано сегодня</div>
         </div>
       </div>
