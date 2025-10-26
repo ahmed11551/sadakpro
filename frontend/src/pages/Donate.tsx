@@ -5,37 +5,57 @@ function Donate() {
   const [selectedAmount, setSelectedAmount] = useState<number>(0)
   const [customAmount, setCustomAmount] = useState<string>('')
   const [fundId, setFundId] = useState<string>('')
-  const [country, setCountry] = useState<string>('RU')
+  const [category, setCategory] = useState<string>('')
 
-  const amounts = [100, 250, 500, 1000]
+  const amounts = [100, 250, 500, 1000, 2500, 5000]
 
   const handleDonate = () => {
     const amount = selectedAmount || parseFloat(customAmount)
     if (amount > 0) {
+      alert(`Спасибо! Вы пожертвовали ${amount} ₽`)
       // TODO: Implement payment flow
-      console.log('Donating:', amount, 'to fund:', fundId)
     }
   }
 
   return (
-    <div className="container">
+    <div className="fade-in">
       <h1>💰 Пожертвовать</h1>
       
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">1,240</div>
+          <div className="stat-label">Пожертвований</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">524К ₽</div>
+          <div className="stat-label">Собрано сегодня</div>
+        </div>
+      </div>
+      
       <div className="card">
-        <label>Выберите фонд</label>
+        <div className="card-header">
+          <h2>Выберите фонд</h2>
+          <span className="badge">Топ фонд</span>
+        </div>
         <select className="input" value={fundId} onChange={(e) => setFundId(e.target.value)}>
           <option value="">Все фонды</option>
-          <option value="1">Фонд 1</option>
-          <option value="2">Фонд 2</option>
+          <option value="1">🎁 Фонд помощи сиротам</option>
+          <option value="2">🕌 Строительство мечетей</option>
+          <option value="3">📚 Образование для детей</option>
+          <option value="4">🏥 Медицинская помощь</option>
+          <option value="5">🌍 Международные проекты</option>
         </select>
       </div>
 
       <div className="card">
-        <label>Выберите страну</label>
-        <select className="input" value={country} onChange={(e) => setCountry(e.target.value)}>
-          <option value="RU">Россия</option>
-          <option value="KZ">Казахстан</option>
-          <option value="UZ">Узбекистан</option>
+        <h2>Выберите категорию</h2>
+        <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">Все категории</option>
+          <option value="education">📚 Образование</option>
+          <option value="health">🏥 Здоровье</option>
+          <option value="mosques">🕌 Мечети</option>
+          <option value="orphans">🎁 Сироты</option>
+          <option value="international">🌍 Международные</option>
         </select>
       </div>
 
@@ -45,6 +65,7 @@ function Donate() {
           {amounts.map(amount => (
             <button
               key={amount}
+              type="button"
               className={selectedAmount === amount ? 'selected' : ''}
               onClick={() => setSelectedAmount(amount)}
             >
@@ -56,21 +77,40 @@ function Donate() {
         <input
           type="number"
           className="input"
-          placeholder="Или введите свою сумму"
+          placeholder="Или введите свою сумму (минимум 100 ₽)"
           value={customAmount}
           onChange={(e) => {
             setCustomAmount(e.target.value)
             setSelectedAmount(0)
           }}
         />
+        
+        {(selectedAmount > 0 || parseFloat(customAmount) >= 100) && (
+          <button className="button" onClick={handleDonate}>
+            💳 Пожертвовать {selectedAmount || customAmount} ₽
+          </button>
+        )}
       </div>
 
-      <button className="button" onClick={handleDonate}>
-        Пожертвовать
-      </button>
+      <div className="card">
+        <h2>Популярные фонды</h2>
+        <div style={{ marginTop: '16px' }}>
+          <div style={{ padding: '12px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>🎁 Фонд помощи сиротам</span>
+            <button className="button" style={{ width: 'auto', padding: '8px 16px', fontSize: '14px', margin: 0 }}>Выбрать</button>
+          </div>
+          <div style={{ padding: '12px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>🕌 Строительство мечетей</span>
+            <button className="button" style={{ width: 'auto', padding: '8px 16px', fontSize: '14px', margin: 0 }}>Выбрать</button>
+          </div>
+          <div style={{ padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>📚 Образование</span>
+            <button className="button" style={{ width: 'auto', padding: '8px 16px', fontSize: '14px', margin: 0 }}>Выбрать</button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
 export default Donate
-
