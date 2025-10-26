@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Donate from './pages/Donate'
 import Support from './pages/Support'
 import Campaigns from './pages/Campaigns'
@@ -13,6 +12,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<string>('donate')
 
   useEffect(() => {
+    // Get tab from URL
     const urlParams = new URLSearchParams(window.location.search)
     const tab = urlParams.get('tab') || 'donate'
     setActiveTab(tab)
@@ -25,46 +25,51 @@ function App() {
     }
   }, [])
 
+  // Render current page based on activeTab
+  const renderCurrentPage = () => {
+    switch(activeTab) {
+      case 'donate': return <Donate />
+      case 'support': return <Support />
+      case 'campaigns': return <Campaigns />
+      case 'subscription': return <Subscription />
+      case 'zakat': return <Zakat />
+      case 'funds': return <Funds />
+      case 'history': return <History />
+      default: return <Donate />
+    }
+  }
+
   return (
-    <Router>
-      <div className="app">
-        <Routes>
-          <Route path="/" element={<Navigate to={`/?tab=${activeTab}`} />} />
-          <Route path="/donate" element={<Donate />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/campaigns" element={<Campaigns />} />
-          <Route path="/subscription" element={<Subscription />} />
-          <Route path="/zakat" element={<Zakat />} />
-          <Route path="/funds" element={<Funds />} />
-          <Route path="/history" element={<History />} />
-        </Routes>
-        
-        {/* Bottom Navigation */}
-        <nav className="bottom-nav">
-          <button onClick={() => setActiveTab('donate')} className={activeTab === 'donate' ? 'active' : ''}>
-            💰 Пожертвовать
-          </button>
-          <button onClick={() => setActiveTab('support')} className={activeTab === 'support' ? 'active' : ''}>
-            🤲 Поддержать
-          </button>
-          <button onClick={() => setActiveTab('campaigns')} className={activeTab === 'campaigns' ? 'active' : ''}>
-            🎯 Кампании
-          </button>
-          <button onClick={() => setActiveTab('subscription')} className={activeTab === 'subscription' ? 'active' : ''}>
-            📅 Подписка
-          </button>
-          <button onClick={() => setActiveTab('zakat')} className={activeTab === 'zakat' ? 'active' : ''}>
-            📊 Закят
-          </button>
-          <button onClick={() => setActiveTab('funds')} className={activeTab === 'funds' ? 'active' : ''}>
-            🏛️ Фонды
-          </button>
-          <button onClick={() => setActiveTab('history')} className={activeTab === 'history' ? 'active' : ''}>
-            📈 История
-          </button>
-        </nav>
+    <div className="app">
+      <div className="content">
+        {renderCurrentPage()}
       </div>
-    </Router>
+      
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        <button onClick={() => setActiveTab('donate')} className={activeTab === 'donate' ? 'active' : ''}>
+          💰 Пожертвовать
+        </button>
+        <button onClick={() => setActiveTab('support')} className={activeTab === 'support' ? 'active' : ''}>
+          🤲 Поддержать
+        </button>
+        <button onClick={() => setActiveTab('campaigns')} className={activeTab === 'campaigns' ? 'active' : ''}>
+          🎯 Кампании
+        </button>
+        <button onClick={() => setActiveTab('subscription')} className={activeTab === 'subscription' ? 'active' : ''}>
+          📅 Подписка
+        </button>
+        <button onClick={() => setActiveTab('zakat')} className={activeTab === 'zakat' ? 'active' : ''}>
+          📊 Закят
+        </button>
+        <button onClick={() => setActiveTab('funds')} className={activeTab === 'funds' ? 'active' : ''}>
+          🏛️ Фонды
+        </button>
+        <button onClick={() => setActiveTab('history')} className={activeTab === 'history' ? 'active' : ''}>
+          📈 История
+        </button>
+      </nav>
+    </div>
   )
 }
 
